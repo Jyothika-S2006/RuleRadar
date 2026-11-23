@@ -1,0 +1,10 @@
+mcp[cli]
+httpx
+beautifulsoup4
+lxml
+pypdf
+anthropic
+python-dotenv
+pydantic
+pytest
+streamlit
