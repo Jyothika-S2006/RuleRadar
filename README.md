@@ -11,7 +11,7 @@ python -m pip install -r requirements.txt
 Copy-Item .env.example .env
 ```
 
-Add the Anthropic API key and model to `.env` for the LLM features.
+Add a `GROQ_API_KEY`, `GEMINI_API_KEY`, or `ANTHROPIC_API_KEY` to `.env` for the LLM features. When using Groq, the default model is `openai/gpt-oss-120b`; set `RR_MODEL` to override it.
 
 ## MCP tools
 

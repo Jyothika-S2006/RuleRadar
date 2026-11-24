@@ -7,8 +7,37 @@ load_dotenv()
 
 GEMINI_KEY = os.getenv("GEMINI_API_KEY")
 ANTHROPIC_KEY = os.getenv("ANTHROPIC_API_KEY")
+GROQ_KEY = os.getenv("GROQ_API_KEY")
 
-if GEMINI_KEY:
+if GROQ_KEY:
+    from groq import Groq
+
+    _client = Groq(api_key=GROQ_KEY)
+    _model = os.getenv("RR_MODEL") or "openai/gpt-oss-120b"
+
+    def ask_json(system: str, user: str) -> dict:
+        response = _client.chat.completions.create(
+            model=_model,
+            messages=[
+                {
+                    "role": "system",
+                    "content": system + "\nReply with a single JSON object and nothing else.",
+                },
+                {"role": "user", "content": user},
+            ],
+            response_format={"type": "json_object"},
+            temperature=0.1,
+        )
+        text = response.choices[0].message.content
+        if not text:
+            raise ValueError("Groq returned an empty response")
+        text = re.sub(r"^```(?:json)?|```$", "", text.strip(), flags=re.M).strip()
+        result = json.loads(text)
+        if not isinstance(result, dict):
+            raise ValueError("LLM response must be a JSON object")
+        return result
+
+elif GEMINI_KEY:
     from google import genai
     from google.genai import types
 
@@ -48,4 +77,6 @@ elif ANTHROPIC_KEY:
         return json.loads(text)
 else:
     def ask_json(system: str, user: str) -> dict:
-        raise ValueError("No API key found in .env! Add GEMINI_API_KEY or ANTHROPIC_API_KEY.")
+        raise ValueError(
+            "No API key found in .env! Add GROQ_API_KEY, GEMINI_API_KEY, or ANTHROPIC_API_KEY."
+        )

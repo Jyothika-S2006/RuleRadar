@@ -1,5 +1,6 @@
 import hashlib
 import io
+import logging
 import re
 from urllib.parse import urlparse
 
@@ -11,6 +12,14 @@ from . import store
 
 # Only the official sites you will demo. localhost is for the demo page.
 ALLOWED_DOMAINS = {"localhost", "127.0.0.1", "vtu.ac.in", "scholarships.gov.in"}
+logger = logging.getLogger(__name__)
+
+
+def _clean_url(url: str) -> str:
+    url = url.strip().strip("\"'").strip()
+    if not re.match(r"^[A-Za-z][A-Za-z0-9+.-]*://", url):
+        url = f"http://{url}"
+    return url
 
 
 def is_allowed(url: str) -> bool:
@@ -35,6 +44,8 @@ def _extract_pdf_text(content: bytes) -> str:
 
 
 def fetch_policy(url: str) -> dict:
+    logger.info("fetch_policy received URL: %r", url)
+    url = _clean_url(url)
     if not is_allowed(url):
         raise ValueError(f"Domain not allowlisted: {url}")
     try:

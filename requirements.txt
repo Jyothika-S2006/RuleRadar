@@ -1,9 +1,11 @@
-mcp[cli]
+mcp[cli]<2
 httpx
 beautifulsoup4
 lxml
 pypdf
 anthropic
+google-genai
+groq
 python-dotenv
 pydantic
 pytest
